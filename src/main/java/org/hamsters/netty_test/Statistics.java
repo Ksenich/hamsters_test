@@ -4,13 +4,15 @@ import java.util.*;
 
 public class Statistics {
     //TODO: replace by AtomicInt?
+    //Netty is async, so concurrent modification of shared class
+    //is certainly possible, I think
     int activeConnections = 0;
     private int requestCount = 0;
     private int uniqueIPCount = 0;
 
-    Map<String, RedirectInfo> redirects = new HashMap<String, RedirectInfo>();
-    Map<String, RequestsInfo> requests = new HashMap<String, RequestsInfo>();
-    List<ConnectionInfo> connections = new ArrayList<ConnectionInfo>();
+    Map<String, RedirectInfo> redirects = new HashMap<>();
+    Map<String, RequestsInfo> requests = new HashMap<>();
+    List<ConnectionInfo> connections = new ArrayList<>();
 
     public void openConnection() {
         activeConnections++;
@@ -76,7 +78,7 @@ public class Statistics {
         String url;
         int count;
 
-        public RedirectInfo(String url, int count) {
+        private RedirectInfo(String url, int count) {
             this.url = url;
             this.count = count;
         }
@@ -97,7 +99,7 @@ public class Statistics {
 
         public RequestsInfo(String ip, Date last) {
             this.last = last;
-            count = 0;
+            count = 1;
             this.ip = ip;
         }
 

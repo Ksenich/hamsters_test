@@ -5,23 +5,23 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TemplateProvider {
 
     static String helloPage = "sorry";
     static String statusPage = "sorry";
+    static Logger log = Logger.getLogger(TemplateProvider.class.getName());
 
     static {
         try {
             helloPage = readFile("pages/hello_world.html");
             statusPage = readFile("pages/status.html");
-            stylesheet = readFile("pages/style.css");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
     }
-
-    private static String stylesheet;
 
     public String hello() {
         return helloPage;
@@ -47,14 +47,13 @@ public class TemplateProvider {
         final int uniqueIPCount = statistics.getUniqueIPCount();
 
         //TODO: optimize;
-        final String page = html
+        return html
                 .replace("{{requests}}", String.valueOf(requests))
                 .replace("{{unique}}", String.valueOf(uniqueIPCount))
                 .replace("{{connections}}", String.valueOf(statistics.getActiveConnections()))
                 .replace("{{redirect_body}}", inflate(statistics.getRedirects()))
                 .replace("{{request_body}}", inflate(statistics.getRequests()))
                 .replace("{{connection_body}}", inflate(statistics.getLastConnections(16)));
-        return page;
     }
 
     private String inflate(Collection<?> collection) {
