@@ -6,10 +6,13 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-public class Launcher {
+/**
+ * Main class and server class combined.
+ */
+public class Server {
     private final int port;
 
-    public Launcher(int port) {
+    public Server(int port) {
         this.port = port;
     }
 
@@ -22,7 +25,11 @@ public class Launcher {
                     .group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ServerInitializer());
-            bootstrap.bind(port).sync().channel().closeFuture().sync();
+            bootstrap.bind(port)
+                    .sync()
+                    .channel()
+                    .closeFuture()
+                    .sync();
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
@@ -34,7 +41,7 @@ public class Launcher {
         if (args.length > 0) {
             port = Integer.parseInt(args[0]);
         }
-        new Launcher(port).run();
+        new Server(port).run();
     }
 
 }

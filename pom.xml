@@ -12,7 +12,7 @@
     <name>netty_test</name>
     <properties>
         <jdk.version>1.8</jdk.version>
-        <netty.version>5.0.0.Alpha2</netty.version>
+        <netty.version>4.0.33.Final</netty.version>
     </properties>
     <dependencies>
 
@@ -44,7 +44,7 @@
                         <manifest>
                             <!-- Jar file entry point -->
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.hamsters.netty_test.Launcher</mainClass>
+                            <mainClass>org.hamsters.netty_test.Server</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -55,7 +55,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
                 <configuration>
-                    <mainClass>org.hamsters.netty_test.Launcher</mainClass>
+                    <mainClass>org.hamsters.netty_test.Server</mainClass>
                 </configuration>
             </plugin>
         </plugins>

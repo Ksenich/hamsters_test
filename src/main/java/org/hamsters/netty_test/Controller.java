@@ -11,7 +11,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * Cause it's roughly takes place of controller in MVC frameworks I worked with;
  */
 public class Controller {
-    private final TemplateProvider templateProvider = new TemplateProvider();
+    private final HtmlProvider htmlProvider = new HtmlProvider();
     private Statistics statistics;
 
     public void setStatistics(Statistics statistics) {
@@ -25,6 +25,13 @@ public class Controller {
     }
 
     //TODO: move statistics gathering to its own class.
+
+    /**
+     * Returns server response for given url.
+     * @param ip Requester ip. Needed only for statistics. Should be removed later.
+     * @param uri Request url.
+     * @return server response.
+     */
     public FullHttpResponse getResponse(String ip, String uri) {
         if (uri.startsWith("/hello")) {
             statistics.request(ip);
@@ -57,7 +64,7 @@ public class Controller {
     }
 
     private FullHttpResponse status() {
-        String status = templateProvider.status(statistics);
+        String status = htmlProvider.status(statistics);
         return new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.copiedBuffer(status, CharsetUtil.UTF_8));
     }
 
@@ -67,7 +74,7 @@ public class Controller {
         } catch (InterruptedException ignored) {
 
         }
-        String hello = templateProvider.hello();
+        String hello = htmlProvider.hello();
         return new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.copiedBuffer(hello, CharsetUtil.UTF_8));
     }
 

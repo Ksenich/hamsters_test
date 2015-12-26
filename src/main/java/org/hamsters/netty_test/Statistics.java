@@ -2,6 +2,9 @@ package org.hamsters.netty_test;
 
 import java.util.*;
 
+/**
+ * Class for monitoring server status.
+ */
 public class Statistics {
     //TODO: replace by AtomicInt?
     //Netty is async, so concurrent modification of shared class
@@ -14,10 +17,22 @@ public class Statistics {
     Map<String, RequestsInfo> requests = new HashMap<>();
     List<ConnectionInfo> connections = new ArrayList<>();
 
+    /**
+     * Increase open connections number.
+     */
     public void openConnection() {
         activeConnections++;
     }
 
+
+    /**
+     * Decrease open connections number and add information about connection to closed connections list.
+     * @param ip requester ip.
+     * @param uri requested url
+     * @param sentBytes bytes sent.
+     * @param receivedBytes bytes received.
+     * @param speed connection speed.
+     */
     public void closeConnection(String ip, String uri, int sentBytes, int receivedBytes, float speed) {
         final ConnectionInfo ci = new ConnectionInfo();
         ci.ip = ip;

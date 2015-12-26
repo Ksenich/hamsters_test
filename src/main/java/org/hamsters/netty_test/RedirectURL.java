@@ -3,6 +3,10 @@ package org.hamsters.netty_test;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * A class for working with redirect url.
+ * Maybe should be replaced with actual url parser
+ */
 public class RedirectURL {
 
     private final String address;

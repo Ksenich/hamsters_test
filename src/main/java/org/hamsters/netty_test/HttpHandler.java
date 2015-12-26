@@ -1,14 +1,14 @@
 package org.hamsters.netty_test;
 
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpRequest;
 
 import java.util.logging.Logger;
 
-public class HttpHandler extends ChannelHandlerAdapter {
+public class HttpHandler extends ChannelInboundHandlerAdapter {
     private final String ip;
     int sentBytes;
     int receivedBytes;
@@ -18,7 +18,7 @@ public class HttpHandler extends ChannelHandlerAdapter {
     Statistics statistics;
 
     public void setStatistics(Statistics statistics) {
-        if(statistics == null)
+        if (statistics == null)
             throw new NullPointerException("Status monitoring is required");
         this.statistics = statistics;
     }
@@ -46,21 +46,17 @@ public class HttpHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         final String msgString = msg.toString();
-        log.info(msgString);
+        log.info("Channel read for " + ip + ": " + msgString);
         receivedBytes += msgString.getBytes().length;
         if (!(msg instanceof HttpRequest))
             return;
         HttpRequest http = (HttpRequest) msg;
-        uri = http.uri();
+        uri = http.getUri();
         final Controller controller = new Controller(statistics);
-        controller.setStatistics(statistics);
         FullHttpResponse response = controller.getResponse(ip, uri);
-        if (response != null) {
 
-            sentBytes = response.content().writerIndex();
-
-            ctx.write(response).addListener(ChannelFutureListener.CLOSE);
-        }
+        sentBytes = response.content().writerIndex();
+        ctx.write(response).addListener(ChannelFutureListener.CLOSE);
     }
 
     @Override

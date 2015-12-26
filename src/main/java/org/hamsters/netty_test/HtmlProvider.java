@@ -8,11 +8,14 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TemplateProvider {
+/**
+ * Class that provides html pages as strings.
+ */
+public class HtmlProvider {
 
     static String helloPage = "sorry";
     static String statusPage = "sorry";
-    static Logger log = Logger.getLogger(TemplateProvider.class.getName());
+    static Logger log = Logger.getLogger(HtmlProvider.class.getName());
 
     static {
         try {
@@ -28,7 +31,7 @@ public class TemplateProvider {
     }
 
     public String status(Statistics statistics) {
-        return fillIn(statusPage, statistics);
+        return fillInStatusPage(statusPage, statistics);
     }
 
     static private String readFile(String path) throws IOException {
@@ -42,7 +45,7 @@ public class TemplateProvider {
         );
     }
 
-    private String fillIn(String html, Statistics statistics) {
+    private String fillInStatusPage(String html, Statistics statistics) {
         final int requests = statistics.getRequestCount();
         final int uniqueIPCount = statistics.getUniqueIPCount();
 
@@ -56,6 +59,7 @@ public class TemplateProvider {
                 .replace("{{connection_body}}", inflate(statistics.getLastConnections(16)));
     }
 
+    //TODO: make inflate work with templates. It is dependent on field declaration ordering now.
     private String inflate(Collection<?> collection) {
         StringBuilder sb = new StringBuilder();
         for (Object o : collection) {

@@ -6,6 +6,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 
+/**
+ *
+ */
 public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private Context context = new Context();
