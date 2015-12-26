@@ -18,14 +18,17 @@ public class HttpHandler extends ChannelHandlerAdapter {
     Statistics statistics;
 
     public void setStatistics(Statistics statistics) {
+        if(statistics == null)
+            throw new NullPointerException("Status monitoring is required");
         this.statistics = statistics;
     }
 
     Logger log = Logger.getLogger(HttpHandler.class.getName());
     private String uri;
 
-    public HttpHandler(String ip) {
+    public HttpHandler(String ip, Statistics statistics) {
         this.ip = ip;
+        setStatistics(statistics);
     }
 
     @Override
@@ -49,7 +52,7 @@ public class HttpHandler extends ChannelHandlerAdapter {
             return;
         HttpRequest http = (HttpRequest) msg;
         uri = http.uri();
-        final Controller controller = new Controller();
+        final Controller controller = new Controller(statistics);
         controller.setStatistics(statistics);
         FullHttpResponse response = controller.getResponse(ip, uri);
         if (response != null) {

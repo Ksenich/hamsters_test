@@ -15,9 +15,16 @@ public class Controller {
     private Statistics statistics;
 
     public void setStatistics(Statistics statistics) {
+        if(statistics == null)
+            throw new NullPointerException("Status monitoring is required");
         this.statistics = statistics;
     }
 
+    public Controller(Statistics statistics){
+        setStatistics(statistics);
+    }
+
+    //TODO: move statistics gathering to its own class.
     public FullHttpResponse getResponse(String ip, String uri) {
         if (uri.startsWith("/hello")) {
             statistics.request(ip);
@@ -32,13 +39,13 @@ public class Controller {
             if (!ruri.isValid())
                 return error404();
             String address = ruri.getAddress();
-            return redirect(ip, address);
+            statistics.redirect(ip, address);
+            return redirect(address);
         }
         return error404();
     }
 
-    private FullHttpResponse redirect(String ip, String to) {
-        statistics.redirect(ip, to);
+    private FullHttpResponse redirect(String to) {
         DefaultFullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, TEMPORARY_REDIRECT);
         //TODO: find revelant constant
         response.headers().set("Location", to);
@@ -55,11 +62,11 @@ public class Controller {
     }
 
     private FullHttpResponse helloWorld() {
-//        try {
-//            Thread.sleep(10 * 1000);
-//        } catch (InterruptedException ignored) {
-//
-//        }
+        try {
+            Thread.sleep(10 * 1000);
+        } catch (InterruptedException ignored) {
+
+        }
         String hello = templateProvider.hello();
         return new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.copiedBuffer(hello, CharsetUtil.UTF_8));
     }
