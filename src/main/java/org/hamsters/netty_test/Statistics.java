@@ -6,9 +6,6 @@ import java.util.*;
  * Class for monitoring server status.
  */
 public class Statistics {
-    //TODO: replace by AtomicInt?
-    //Netty is async, so concurrent modification of shared class
-    //is certainly possible, I think
     int activeConnections = 0;
     private int requestCount = 0;
     private int uniqueIPCount = 0;
@@ -20,7 +17,7 @@ public class Statistics {
     /**
      * Increase open connections number.
      */
-    public void openConnection() {
+    public synchronized void openConnection() {
         activeConnections++;
     }
 
@@ -33,7 +30,7 @@ public class Statistics {
      * @param receivedBytes bytes received.
      * @param speed connection speed.
      */
-    public void closeConnection(String ip, String uri, int sentBytes, int receivedBytes, float speed) {
+    public synchronized void closeConnection(String ip, String uri, int sentBytes, int receivedBytes, float speed) {
         final ConnectionInfo ci = new ConnectionInfo();
         ci.ip = ip;
         ci.uri = uri;
@@ -57,7 +54,7 @@ public class Statistics {
         return activeConnections;
     }
 
-    public void redirect(String ip, String to) {
+    public synchronized void redirect(String ip, String to) {
         request(ip);
         if (redirects.containsKey(to))
             redirects.get(to).incrementCount();
@@ -65,7 +62,7 @@ public class Statistics {
             redirects.put(to, new RedirectInfo(to));
     }
 
-    public void request(String ip) {
+    public synchronized void request(String ip) {
         requestCount++;
         if (requests.containsKey(ip))
             requests.get(ip).incrementCount();
@@ -75,17 +72,21 @@ public class Statistics {
         }
     }
 
-    public Collection<RedirectInfo> getRedirects() {
-        return redirects.values();
+    public synchronized Collection<RedirectInfo> getRedirects() {
+        ArrayList<RedirectInfo> copy = new ArrayList<>(redirects.size());
+        copy.addAll(redirects.values());
+        return copy;
     }
 
-    public Collection<ConnectionInfo> getLastConnections(int limit) {
+    public synchronized Collection<ConnectionInfo> getLastConnections(int limit) {
         final int last = connections.size();
         final int first = Math.max(last - 1 - limit, 0);
-        return connections.subList(first, last);
+        ArrayList<ConnectionInfo> copy = new ArrayList<>(last - first);
+        copy.addAll(connections.subList(first, last));
+        return copy;
     }
 
-    public Collection<RequestsInfo> getRequests() {
+    public synchronized Collection<RequestsInfo> getRequests() {
         return requests.values();
     }
 

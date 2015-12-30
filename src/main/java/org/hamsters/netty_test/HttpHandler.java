@@ -6,8 +6,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpRequest;
 
-import java.util.logging.Logger;
-
 public class HttpHandler extends ChannelInboundHandlerAdapter {
     private final String ip;
     int sentBytes;
@@ -23,7 +21,6 @@ public class HttpHandler extends ChannelInboundHandlerAdapter {
         this.statistics = statistics;
     }
 
-    Logger log = Logger.getLogger(HttpHandler.class.getName());
     private String uri;
 
     public HttpHandler(String ip, Statistics statistics) {
@@ -32,21 +29,14 @@ public class HttpHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-        log.info("Channel registered for " + ip);
-    }
-
-    @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.info("Channel active for " + ip);
         statistics.openConnection();
-        connectionStart = System.currentTimeMillis();
+        connectionStart = System.nanoTime();//currentTimeMillis();
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         final String msgString = msg.toString();
-        log.info("Channel read for " + ip + ": " + msgString);
         receivedBytes += msgString.getBytes().length;
         if (!(msg instanceof HttpRequest))
             return;
@@ -61,19 +51,14 @@ public class HttpHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        final float connectionTime = (System.currentTimeMillis() - connectionStart) / 1000f;
-        speed = (sentBytes + receivedBytes) / connectionTime;
-        statistics.closeConnection(ip, uri, sentBytes, receivedBytes, speed);
         ctx.flush();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.info("Channel Inactive for " + ip);
+        final float connectionTime = (System.nanoTime() - connectionStart) / 1_000_000_000f;
+        speed = (sentBytes + receivedBytes) / connectionTime;
+        statistics.closeConnection(ip, uri, sentBytes, receivedBytes, speed);
     }
 
-    @Override
-    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        log.info("Channel unregistered for " + ip);
-    }
 }
