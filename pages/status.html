@@ -6,8 +6,8 @@
     <title>Status</title>
     <style>
         th, td {
-            text-align: left;
-            padding-right: 20px;
+        text-align: left;
+        padding-right: 20px;
         }
     </style>
 </head>
@@ -17,34 +17,11 @@
     <p>Unique: {{unique}}</p>
     <p>Connections active: {{connections}}</p>
     <h3>Счетчик запросов</h3>
-    <table class="table" id="count">
-        <tr>
-            <th>ip</th>
-            <th>count</th>
-            <th>last</th>
-        </tr>
-        {{request_body}}
-    </table>
+    {{request_table}}
     <h3>Количество переадресаций</h3>
-    <table class="table" id="redirects">
-        <tr>
-            <th>url</th>
-            <th>count</th>
-        </tr>
-        {{redirect_body}}
-    </table>
+    {{redirect_table}}
     <h3>Последние обработанные соединения</h3>
-    <table class="table" id="last_connections">
-        <tr>
-            <th>src_ip</th>
-            <th>uri</th>
-            <th>timestamp</th>
-            <th>sent</th>
-            <th>received</th>
-            <th>speed</th>
-        </tr>
-        {{connection_body}}
-    </table>
+    {{connection_table}}
 </div>
 </body>
 </html>

@@ -31,7 +31,7 @@ public class HttpHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         statistics.openConnection();
-        connectionStart = System.nanoTime();//currentTimeMillis();
+        connectionStart = System.nanoTime();
     }
 
     @Override

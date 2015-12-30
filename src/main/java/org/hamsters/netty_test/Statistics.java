@@ -6,13 +6,14 @@ import java.util.*;
  * Class for monitoring server status.
  */
 public class Statistics {
+    public static final int HISTORY_LIMIT = 16;
     int activeConnections = 0;
     private int requestCount = 0;
     private int uniqueIPCount = 0;
 
     Map<String, RedirectInfo> redirects = new HashMap<>();
     Map<String, RequestsInfo> requests = new HashMap<>();
-    List<ConnectionInfo> connections = new ArrayList<>();
+    Deque<ConnectionInfo> connections = new ArrayDeque<>();
 
     /**
      * Increase open connections number.
@@ -38,7 +39,10 @@ public class Statistics {
         ci.received = receivedBytes;
         ci.speed = speed;
         ci.timestamp = new Date();
-        connections.add(ci);
+        connections.addFirst(ci);
+        while(connections.size() > HISTORY_LIMIT){
+            connections.removeLast();
+        }
         activeConnections--;
     }
 
@@ -78,11 +82,9 @@ public class Statistics {
         return copy;
     }
 
-    public synchronized Collection<ConnectionInfo> getLastConnections(int limit) {
-        final int last = connections.size();
-        final int first = Math.max(last - 1 - limit, 0);
-        ArrayList<ConnectionInfo> copy = new ArrayList<>(last - first);
-        copy.addAll(connections.subList(first, last));
+    public synchronized Collection<ConnectionInfo> getLastConnections() {
+        ArrayList<ConnectionInfo> copy = new ArrayList<>(connections.size());
+        copy.addAll(connections);
         return copy;
     }
 
